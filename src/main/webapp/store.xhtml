@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:t="http://myfaces.apache.org/tomahawk">
+<head>
+<title>Hello World</title>
+</head>
+<body>
+<ui:composition template="/template.xhtml">
+<ui:define name="title">EBean Shoppe Catalog</ui:define>
+	<ui:define name="body">
+		<h:form>
+			<h:dataTable value="#{catalogBean.productList}" var="state" id="dt1"
+				bgcolor="#F1F1F1" border="10" cellpadding="5" cellspacing="3"
+				first="0" rows="4" width="50%" dir="LTR" frame="hsides" rules="all"
+				summary="This is a JSF code to create dataTable.">
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="SKU" />
+					</f:facet>
+					<h:outputText value="#{state.sku}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Description" />
+					</f:facet>
+					<h:outputText value="#{state.name}" />
+				</h:column>
+				<h:column>
+					<f:facet name="header">
+						<h:outputText value="Action" />
+					</f:facet>
+					<h:commandLink value="Add to cart" action="#{catalogBean.selectItem}">
+						<f:setPropertyActionListener target="#{catalogBean.item}"
+							value="#{state}" />
+					</h:commandLink>
+				</h:column>
+			</h:dataTable>
+		</h:form>
+	</ui:define>
+</ui:composition>
+</body>
+</html>
