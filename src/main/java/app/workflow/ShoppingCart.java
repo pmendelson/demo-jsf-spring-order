@@ -2,6 +2,8 @@ package app.workflow;
 
 import java.util.logging.Logger;
 
+import com.avaje.ebean.EbeanServer;
+
 import app.data.Order;
 import app.data.OrderDetail;
 import app.data.Product;
@@ -14,6 +16,7 @@ public class ShoppingCart {
 	private static Logger log = Logger.getLogger(ShoppingCart.class.getName());
 	private static final long serialVersionUID = 1L;
 	private Order mPayload;
+	private EbeanServer mServer;
 
 	public ShoppingCart(Order ord) {
 		mPayload = ord!=null?ord:new Order();
@@ -51,5 +54,15 @@ public class ShoppingCart {
 
 	public boolean isEmpty() {
 		return mPayload==null || mPayload.getDetails().isEmpty();
+	}
+
+	/**
+	 * Sets the ebean server.
+	 * 
+	 * @param ebeanServer
+	 *            the ebeanServer to set
+	 */
+	public void setEbeanServer(EbeanServer ebeanServer) {
+		this.mServer = ebeanServer;
 	}
 }

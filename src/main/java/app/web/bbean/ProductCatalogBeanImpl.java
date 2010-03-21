@@ -5,11 +5,14 @@ import java.util.logging.Logger;
 
 import javax.faces.component.html.HtmlDataTable;
 import javax.faces.component.html.HtmlInputHidden;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import app.data.Product;
+import app.workflow.ShoppingCart;
 
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.PagingList;
@@ -38,6 +41,8 @@ public class ProductCatalogBeanImpl implements ProductCatalogBean {
 	private HtmlDataTable dataTable;
 	private Product dataItem = new Product();
 	private HtmlInputHidden dataItemId = new HtmlInputHidden();
+//	@Autowired
+//	private ShoppingCart mCart;
 
 	// Actions
 	// -----------------------------------------------------------------------------------
@@ -49,7 +54,12 @@ public class ProductCatalogBeanImpl implements ProductCatalogBean {
 	}
 
 	public void addToCart(ValueChangeEvent event) {
-		log.info("add To Cart "+event.getOldValue()+" to "+event.getNewValue());
+		final HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+		ShoppingCart cart=(ShoppingCart) session.getAttribute("cart");
+		if(cart!=null)
+			cart=new ShoppingCart(null);
+		cart.addItem(getCurrentItem(), Integer.parseInt((String) event.getNewValue()));
+//		log.info("add To Cart "+event.getOldValue()+" to "+event.getNewValue());
 	}
 	// Getters
 	// -----------------------------------------------------------------------------------
@@ -132,4 +142,14 @@ public class ProductCatalogBeanImpl implements ProductCatalogBean {
 	public void setEbeanServer(EbeanServer ebeanServer) {
 		this.mServer = ebeanServer;
 	}
+
+	/**
+	 * Sets the ebean server.
+	 * 
+	 * @param ebeanServer
+	 *            the ebeanServer to set
+	 */
+//	public void setShoppingCart(ShoppingCart v) {
+//		this.mCart = v;
+//	}
 }
