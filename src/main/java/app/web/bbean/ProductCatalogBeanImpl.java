@@ -54,12 +54,17 @@ public class ProductCatalogBeanImpl implements ProductCatalogBean {
 	}
 
 	public void addToCart(ValueChangeEvent event) {
-		final HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
-		ShoppingCart cart=(ShoppingCart) session.getAttribute("cart");
-		if(cart!=null)
-			cart=new ShoppingCart(null);
+		ShoppingCart cart = getShoppingCart();
 		cart.addItem(getCurrentItem(), Integer.parseInt((String) event.getNewValue()));
 //		log.info("add To Cart "+event.getOldValue()+" to "+event.getNewValue());
+	}
+
+	private ShoppingCart getShoppingCart() {
+		ShoppingCart cart=(ShoppingCart) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("cart");
+		log.info("Cart from session map="+cart);
+		if(cart==null)
+			cart=new ShoppingCart(null);
+		return cart;
 	}
 	// Getters
 	// -----------------------------------------------------------------------------------
@@ -70,6 +75,9 @@ public class ProductCatalogBeanImpl implements ProductCatalogBean {
 
 	public HtmlInputHidden getDataItemId() {
 		return dataItemId;
+	}
+	public HtmlDataTable getDataTable() {
+		return dataTable;
 	}
 
 	// Setters
@@ -86,6 +94,13 @@ public class ProductCatalogBeanImpl implements ProductCatalogBean {
 
 	public void setDataItemId(HtmlInputHidden dataItemId) {
 		this.dataItemId = dataItemId;
+	}
+
+	public String getItemActionLabel() {
+		Product prod=(Product) dataTable.getRowData();
+		log.info("prod="+prod);
+		ShoppingCart cart = getShoppingCart();
+		return cart!=null && cart.hasItem(prod)?"Remove from Cart":"Add to Cart";
 	}
 
 	public List<Product> getProductList() {

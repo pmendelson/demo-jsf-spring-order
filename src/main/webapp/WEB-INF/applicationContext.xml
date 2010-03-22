@@ -9,44 +9,44 @@
            				http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
 	<import resource="classpath:default-ebean-server.xml"/>
-	<bean
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<!--  config.file is set by initializing the JVM with a parameter such as -Dconfig.file="/proj/config/test1.properties".
-			to use a different convention replace ${config.file} with a hard coded value.
-		-->
-		<property name="location">
-			<value>classpath:local.properties</value>
-<!-- 			<value>file:${config.file}</value> -->
-		</property>
-		<property name="properties">
-			<props>
-				<prop key="jdbc.url">
-					${jdbc.url}
-				</prop>
-				<prop key="jdbc.username">
-					${jdbc.username}
-				</prop>
-				<prop key="jdbc.password">
-					${jdbc.password}
-				</prop>
-				<prop key="jdbc.driver">
-					${jdbc.driver}
-				</prop>
-			</props>
-		</property>
-	</bean>
+    <bean
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <!--  config.file is set by initializing the JVM with a parameter such as -Dconfig.file="/proj/config/test1.properties".
+            to use a different convention replace ${config.file} with a hard coded value.
+        -->
+        <property name="location">
+            <value>classpath:local.properties</value>
+<!--             <value>file:${config.file}</value> -->
+        </property>
+        <property name="properties">
+            <props>
+                <prop key="jdbc.url">
+                    ${jdbc.url}
+                </prop>
+                <prop key="jdbc.username">
+                    ${jdbc.username}
+                </prop>
+                <prop key="jdbc.password">
+                    ${jdbc.password}
+                </prop>
+                <prop key="jdbc.driver">
+                    ${jdbc.driver}
+                </prop>
+            </props>
+        </property>
+    </bean>
 
 	<!-- Transaktionen via Annotation use Springs @Transactional -->
 	<tx:annotation-driven transaction-manager="transactionManager" />
 	<context:annotation-config />
 
 	<!-- The real DataSource  -->
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
-		<property name="driverClassName" value="${jdbc.driver}" />
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
-		<property name="password" value="${jdbc.password}" />
-	</bean>
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+    </bean>
 
 	<!--  Transaction Manager -->
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
@@ -77,6 +77,10 @@
 	</bean>
 
 	<bean id="catalogBean" class="app.web.bbean.ProductCatalogBeanImpl">
+		<property name="ebeanServer" ref="ebeanServer"/>
+	</bean>
+	
+	<bean id="shoppingCart" class="app.workflow.ShoppingCart" scope="session">
 		<property name="ebeanServer" ref="ebeanServer"/>
 	</bean>
 </beans>

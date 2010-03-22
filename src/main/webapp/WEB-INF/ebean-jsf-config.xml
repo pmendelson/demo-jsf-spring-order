@@ -17,11 +17,17 @@
 	<managed-bean>
 		<managed-bean-name>estore</managed-bean-name>
 		<managed-bean-class>
-			app.bbean.layout.EBeanStoreBean
+			app.web.bbean.layout.EBeanStoreBean
 		</managed-bean-class>
 		<managed-bean-scope>request</managed-bean-scope>
 	</managed-bean>
-
+	<managed-bean>
+		<managed-bean-name>cart</managed-bean-name>
+		<managed-bean-class>
+			app.workflow.ShoppingCart
+		</managed-bean-class>
+		<managed-bean-scope>session</managed-bean-scope>
+	</managed-bean>
 	<!-- navigation rules for helloWorld.jsp
 	<navigation-rule>
 		<from-view-id>/helloWorld.xhtml</from-view-id>

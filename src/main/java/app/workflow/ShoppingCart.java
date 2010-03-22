@@ -17,7 +17,9 @@ public class ShoppingCart {
 	private static final long serialVersionUID = 1L;
 	private Order mPayload;
 	private EbeanServer mServer;
-
+public ShoppingCart() {
+	this(null);
+}
 	public ShoppingCart(Order ord) {
 		mPayload = ord!=null?ord:new Order();
 	}
