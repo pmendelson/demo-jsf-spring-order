@@ -1,170 +1,165 @@
 package app.web.bbean;
 
+import app.data.Product;
+import app.workflow.ShoppingCart;
+import io.ebean.Database;
+import io.ebean.Expr;
+import io.ebean.PagedList;
+import io.ebean.Query;
 import java.util.List;
 import java.util.logging.Logger;
-
 import javax.faces.component.html.HtmlDataTable;
 import javax.faces.component.html.HtmlInputHidden;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
-import app.data.Product;
-import app.workflow.ShoppingCart;
-
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.PagingList;
-import com.avaje.ebean.Query;
-
-/**
- * Homepage
- */
+/** Homepage */
 public class ProductCatalogBeanImpl implements ProductCatalogBean {
-	private static Logger log = Logger.getLogger(ProductCatalogBeanImpl.class.getName());
-	private static final long serialVersionUID = 1L;
-	/** The ebean server. */
-	@Autowired
-	private EbeanServer mServer;
-	private static final String ID4BUTTON_BAR = "buttonbar";
-	private static final String ID4PRODUCT_LIST = "plist";
-	private static final String SORTBY_NAME = "name";
-	private static final String SORTBY_SKU = "sku";
-	private transient Query<Product> query;
-	private transient PagingList<Product> pager = null;
-	private boolean orderup;
-	private String sortProp;
-	// Init
-	// --------------------------------------------------------------------------------------
+  private static Logger log = Logger.getLogger(ProductCatalogBeanImpl.class.getName());
+  private static final long serialVersionUID = 1L;
+  /** The ebean server. */
+  @Autowired private Database mServer;
 
-	private HtmlDataTable dataTable;
-	private Product dataItem = new Product();
-	private HtmlInputHidden dataItemId = new HtmlInputHidden();
-//	@Autowired
-//	private ShoppingCart mCart;
+  private static final String ID4BUTTON_BAR = "buttonbar";
+  private static final String ID4PRODUCT_LIST = "plist";
+  private static final String SORTBY_NAME = "name";
+  private static final String SORTBY_SKU = "sku";
+  private transient Query<Product> query;
+  private transient PagedList<Product> pager = null;
+  private boolean orderup;
+  private String sortProp;
+  // Init
+  // --------------------------------------------------------------------------------------
 
-	// Actions
-	// -----------------------------------------------------------------------------------
+  private HtmlDataTable dataTable;
+  private Product dataItem = new Product();
+  private HtmlInputHidden dataItemId = new HtmlInputHidden();
+  //	@Autowired
+  //	private ShoppingCart mCart;
 
-	public String selectItem() {
-		// Store the ID of the data item in hidden input element.
-		dataItemId.setValue(dataItem.getId());
-		return "buy"; // Navigation case.
-	}
+  // Actions
+  // -----------------------------------------------------------------------------------
 
-	public void addToCart(ValueChangeEvent event) {
-		ShoppingCart cart = getShoppingCart();
-		cart.addItem(getCurrentItem(), Integer.parseInt((String) event.getNewValue()));
-//		log.info("add To Cart "+event.getOldValue()+" to "+event.getNewValue());
-	}
+  @Override
+  public String selectItem() {
+    // Store the ID of the data item in hidden input element.
+    dataItemId.setValue(dataItem.getId());
+    return "buy"; // Navigation case.
+  }
 
-	private ShoppingCart getShoppingCart() {
-		ShoppingCart cart=(ShoppingCart) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("cart");
-		log.info("Cart from session map="+cart);
-		if(cart==null)
-			cart=new ShoppingCart(null);
-		return cart;
-	}
-	// Getters
-	// -----------------------------------------------------------------------------------
+  public void addToCart(ValueChangeEvent event) {
+    var cart = getShoppingCart();
+    cart.addItem(getCurrentItem(), Integer.parseInt((String) event.getNewValue()));
+    //		log.info("add To Cart "+event.getOldValue()+" to "+event.getNewValue());
+  }
 
-	public Product getCurrentItem() {
-		return dataItem;
-	}
+  private ShoppingCart getShoppingCart() {
+    var cart =
+        (ShoppingCart)
+            FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("cart");
+    log.info("Cart from session map=" + cart);
+    if (cart == null) cart = new ShoppingCart(null);
+    return cart;
+  }
+  // Getters
+  // -----------------------------------------------------------------------------------
 
-	public HtmlInputHidden getDataItemId() {
-		return dataItemId;
-	}
-	public HtmlDataTable getDataTable() {
-		return dataTable;
-	}
+  public Product getCurrentItem() {
+    return dataItem;
+  }
 
-	// Setters
-	// -----------------------------------------------------------------------------------
+  public HtmlInputHidden getDataItemId() {
+    return dataItemId;
+  }
 
-	public void setDataTable(HtmlDataTable dataTable) {
-		this.dataTable = dataTable;
-	}
+  public HtmlDataTable getDataTable() {
+    return dataTable;
+  }
 
-	public void setItem(Product dataItem) {
-		log.info("SET..." + dataItem);
-		this.dataItem = dataItem;
-	}
+  // Setters
+  // -----------------------------------------------------------------------------------
 
-	public void setDataItemId(HtmlInputHidden dataItemId) {
-		this.dataItemId = dataItemId;
-	}
+  @Override
+  public void setDataTable(HtmlDataTable dataTable) {
+    this.dataTable = dataTable;
+  }
 
-	public String getItemActionLabel() {
-		Product prod=(Product) dataTable.getRowData();
-		log.info("prod="+prod);
-		ShoppingCart cart = getShoppingCart();
-		return cart!=null && cart.hasItem(prod)?"Remove from Cart":"Add to Cart";
-	}
+  @Override
+  public void setItem(Product dataItem) {
+    log.info("SET..." + dataItem);
+    this.dataItem = dataItem;
+  }
 
-	public List<Product> getProductList() {
-		int first = 1;
-		int count = 100;
-		if (pager == null) {
-			setPager(count);
-		}
-		return pager.getPage(first / pager.getPageSize()).getList();
-	}
+  public void setDataItemId(HtmlInputHidden dataItemId) {
+    this.dataItemId = dataItemId;
+  }
 
-	public int getSize() {
-		if (pager == null) {
-			return getQuery().findRowCount();
-		} else
-			return pager.getTotalRowCount();
-	}
+  public String getItemActionLabel() {
+    var prod = (Product) dataTable.getRowData();
+    log.info("prod=" + prod);
+    var cart = getShoppingCart();
+    return cart != null && cart.hasItem(prod) ? "Remove from Cart" : "Add to Cart";
+  }
 
-	private Query<Product> getQuery() {
-		if (query == null)
-			query = mServer.find(Product.class);
-		return query;
-	}
+  @Override
+  public List<Product> getProductList() {
+    var first = 1;
+    var count = 100;
+    if (pager == null) {
+      setPager(count);
+    }
+    return pager.getList(); // getPage(first / pager.getPageSize()).getList();
+  }
 
-	private void setPager(int count) {
-		if (query == null)
-			setFilter(null);
-		// SortParam sort = getSort();
-		// orderup = sort == null || sort.isAscending();
-		// if (sort != null && sort.getProperty().equalsIgnoreCase(SORTBY_SKU))
-		// {
-		// query.orderBy("sku" + (orderup ? "" : " desc") + ",name,id");
-		// sortProp = SORTBY_SKU;
-		// } else {
-		query.orderBy("name" + (orderup ? "" : " desc") + ",sku,id");
-		// sortProp = SORTBY_NAME;
-		// }
-		pager = query.findPagingList(count);
-	}
+  @Override
+  public int getSize() {
+    if (pager == null) {
+      return getQuery().findCount();
+    } else return pager.getTotalCount();
+  }
 
-	public void setFilter(String search) {
-		query = mServer.find(Product.class);
-		if (search != null)
-			query.where("name" + " like " + "'%" + search + "%'");
-		pager = null;
-	}
+  private Query<Product> getQuery() {
+    if (query == null) query = mServer.find(Product.class);
+    return query;
+  }
 
-	/**
-	 * Sets the ebean server.
-	 * 
-	 * @param ebeanServer
-	 *            the ebeanServer to set
-	 */
-	public void setEbeanServer(EbeanServer ebeanServer) {
-		this.mServer = ebeanServer;
-	}
+  private void setPager(int count) {
+    if (query == null) setFilter(null);
+    // SortParam sort = getSort();
+    // orderup = sort == null || sort.isAscending();
+    // if (sort != null && sort.getProperty().equalsIgnoreCase(SORTBY_SKU))
+    // {
+    // query.orderBy("sku" + (orderup ? "" : " desc") + ",name,id");
+    // sortProp = SORTBY_SKU;
+    // } else {
+    query.orderBy("name" + (orderup ? "" : " desc") + ",sku,id");
+    // sortProp = SORTBY_NAME;
+    // }
+    pager = query.findPagedList();
+  }
 
-	/**
-	 * Sets the ebean server.
-	 * 
-	 * @param ebeanServer
-	 *            the ebeanServer to set
-	 */
-//	public void setShoppingCart(ShoppingCart v) {
-//		this.mCart = v;
-//	}
+  public void setFilter(String search) {
+    query = mServer.find(Product.class);
+    if (search != null) query.where(Expr.raw("name" + " like " + "'%" + search + "%'"));
+    pager = null;
+  }
+
+  /**
+   * Sets the ebean server.
+   *
+   * @param ebeanServer the ebeanServer to set
+   */
+  public void setEbeanServer(Database ebeanServer) {
+    this.mServer = ebeanServer;
+  }
+
+  /**
+   * Sets the ebean server.
+   *
+   * @param ebeanServer the ebeanServer to set
+   */
+  //	public void setShoppingCart(ShoppingCart v) {
+  //		this.mCart = v;
+  //	}
 }
